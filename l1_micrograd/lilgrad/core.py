@@ -68,14 +68,13 @@ class Value:
     def __sub__(self, other):
         return self + (-other)
     
-    @input_to_value()
+
     @set_out_backward()
     def __pow__(self, other):
-        out = Value(self.data ** other.data, (self, other), _op='**')
+        out = Value(self.data ** other, (self,), _op='**')
         
         def _backward():
-            self.grad += (other.data * (self.data ** (other.data - 1))) * out.grad
-            other.grad += (out.data * math.log(self.data)) * out.grad
+            self.grad += (other * (self.data ** (other - 1))) * out.grad
 
         return out, _backward
     
@@ -179,9 +178,6 @@ class Value:
     @input_to_value()
     def __rmul__(self, other):
         return other * self
-    @input_to_value()
-    def __rpow__(self, other):
-        return other ** self
     @input_to_value()
     def __rtruediv__(self, other):
         return other / self
